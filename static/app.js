@@ -91,11 +91,61 @@ function captchaForm(job) {
   async function send(action){try{await api('/api/jobs/'+job.id+'/captcha',{challenge_id:job.challenge.id,action,answer:input.value});await poll();}catch(e){notice(e.message);}}
   form.onsubmit=e=>{e.preventDefault();send('answer');};refresh.onclick=()=>send('refresh');buttons.append(submit,refresh);form.append(el('label','请输入图片中的 5 位数字（3 分钟内）'),image,input,buttons);return form;
 }
+const SUB_EXTS=['.srt','.ass','.ssa','.sup','.vtt','.sub','.idx','.smi'];
+const linkState={file:null,cwd:'',video:'',settings:null};
+function linkBadge(file){
+  if(file.link?.delete_in!=null){const wrap=el('span',undefined,'link-badge pending');wrap.append(`硬链接已删除，${file.link.delete_in} 秒后删除 `);const keep=el('button','保留','text-button');keep.onclick=()=>api('/api/links/keep',{file:file.path}).then(refreshFiles).catch(e=>notice(e.message));wrap.append(keep);return wrap;}
+  if(file.nlink>1)return el('span',`已关联 ${file.nlink-1} 处`,'link-badge');
+  return null;
+}
 async function refreshFiles() {
   const files=await api('/api/files'),box=$('#files');$('#file-count').textContent=files.length;box.replaceChildren();
   if(!files.length)box.append(el('p','还没有下载文件。','muted'));
-  for(const file of files){const row=el('div',undefined,'file-row'),link=el('a',file.name);link.href=fileURL(file.path);row.append(link,el('span',file.size<1024?file.size+' B':(file.size/1024).toFixed(1)+' KB','file-size'));box.append(row);}
+  for(const file of files){
+    const row=el('div',undefined,'file-row'),link=el('a',file.name);link.href=fileURL(file.path);row.append(link);
+    const badge=linkBadge(file);if(badge)row.append(badge);
+    if(linkState.settings?.media_configured&&SUB_EXTS.some(x=>file.name.toLowerCase().endsWith(x))){const b=el('button','关联到媒体','text-button');b.onclick=()=>openLink(file);row.append(b);}
+    row.append(el('span',file.size<1024?file.size+' B':(file.size/1024).toFixed(1)+' KB','file-size'));box.append(row);
+  }
 }
+function guessLang(name){return /繁|正體|cht|big5|zh-tw/i.test(name)?'zh-TW':'zh-CN';}
+function linkPreview(){
+  const ext=linkState.file.name.slice(linkState.file.name.lastIndexOf('.')).toLowerCase();
+  $('#link-submit').disabled=!linkState.video;
+  $('#link-preview').textContent=linkState.video?'将创建：'+linkState.video.replace(/\.[^./]+$/,'')+'.'+$('#link-lang').value+ext:'请选择视频文件';
+}
+async function browse(path){
+  const data=await api('/api/media?path='+encodeURIComponent(path));linkState.cwd=data.path;linkState.video='';
+  $('#link-cwd').textContent='/'+data.path;const list=$('#link-list');list.replaceChildren();
+  for(const d of data.dirs){const b=el('button','📁 '+d);b.onclick=()=>browse((data.path?data.path+'/':'')+d).catch(e=>{$('#link-preview').textContent=e.message;});list.append(b);}
+  for(const v of data.videos){const b=el('button','🎬 '+v);b.onclick=()=>{list.querySelectorAll('.selected').forEach(n=>n.classList.remove('selected'));b.classList.add('selected');linkState.video=(data.path?data.path+'/':'')+v;linkPreview();};list.append(b);}
+  if(!data.dirs.length&&!data.videos.length)list.append(el('p','此目录没有子目录或视频文件。','muted'));
+  linkPreview();
+}
+async function openLink(file){
+  linkState.file=file;$('#link-file').textContent='字幕：'+file.name;$('#link-lang').value=guessLang(file.name);
+  try{await browse(linkState.cwd);$('#link-dialog').showModal();}catch(e){notice(e.message);}
+}
+async function loadLinkSettings(){
+  const s=await api('/api/links/settings');linkState.settings=s;
+  $('#auto-clean').checked=s.auto_clean;$('#clean-delay').value=s.delay;
+  $('#clean-hint').textContent=s.media_configured?'':'未配置 MEDIA_DIR，无法从网页关联到媒体';
+  const sel=$('#link-lang');sel.replaceChildren();for(const [k,v] of Object.entries(s.langs)){const o=el('option',`${v}（.${k}）`);o.value=k;sel.append(o);}
+}
+async function saveCleanSettings(){
+  try{const delay=Number($('#clean-delay').value);if(!(delay>=5))throw new Error('延迟至少 5 秒');
+    linkState.settings=await fetch('/api/links/settings',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({auto_clean:$('#auto-clean').checked,delay})}).then(async r=>{if(!r.ok)throw new Error('设置保存失败');return r.json();});notice('');}
+  catch(e){notice(e.message);}
+}
+$('#auto-clean').onchange=saveCleanSettings;$('#clean-delay').onchange=saveCleanSettings;
+$('#link-lang').onchange=linkPreview;$('#close-link').onclick=()=>$('#link-dialog').close();
+$('#link-up').onclick=()=>browse(linkState.cwd.split('/').slice(0,-1).join('/')).catch(e=>notice(e.message));
+$('#link-submit').onclick=async()=>{
+  const b=$('#link-submit');b.disabled=true;
+  try{const r=await api('/api/links',{file:linkState.file.path,video:linkState.video,lang:$('#link-lang').value});$('#link-dialog').close();notice('');await refreshFiles();
+    if(r.existing)notice('该硬链接已存在：'+r.target);}
+  catch(e){$('#link-preview').textContent=e.message;}finally{b.disabled=false;}
+};
 async function poll() {
   if(state.pending)return;state.pending=true;
   try{state.jobs=await api('/api/jobs');$('#connection').textContent='● 服务已连接';updateResults();updateTasks();}
@@ -111,5 +161,5 @@ $('#search-form').onsubmit=async e=>{
 $('#search-history').onchange=e=>{state.selected=e.target.value;updateResults();};
 $('#refresh-files').onclick=()=>refreshFiles().catch(e=>notice(e.message));
 $('#close-detail').onclick=()=>$('#detail-dialog').close();
-async function init(){try{const settings=await api('/api/settings');for(const key of ['keyword','fmt','language','limit'])$('#'+key).value=settings[key];$('#use-ocr').checked=settings.use_ocr;document.querySelectorAll('input[name=sources]').forEach(n=>n.checked=settings.sources.includes(n.value));await refreshFiles();}catch(e){notice(e.message);}await poll();setInterval(poll,1600);setInterval(()=>refreshFiles().catch(()=>{}),10000);}
+async function init(){try{const settings=await api('/api/settings');for(const key of ['keyword','fmt','language','limit'])$('#'+key).value=settings[key];$('#use-ocr').checked=settings.use_ocr;document.querySelectorAll('input[name=sources]').forEach(n=>n.checked=settings.sources.includes(n.value));await loadLinkSettings();await refreshFiles();}catch(e){notice(e.message);}await poll();setInterval(poll,1600);setInterval(()=>refreshFiles().catch(()=>{}),5000);}
 init();

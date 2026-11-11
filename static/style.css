@@ -3,3 +3,15 @@
 .options input[type=number]{font:inherit;color:#4f6153;background:#f5f7f1;border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:64px}
 
 #detail-content{max-height:65vh;overflow:auto;line-height:1.9;overflow-wrap:anywhere}#detail-content h3{font-size:16px}.detail-fields{display:grid;grid-template-columns:90px 1fr;gap:7px 15px}.detail-fields dt{color:var(--muted)}.detail-fields dd{margin:0}#detail-content li{font-size:12px;margin-bottom:7px}
+
+.clean-bar{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;padding:12px 18px;margin-bottom:12px;font-size:12px}
+.clean-bar input[type=number]{width:80px;font:inherit;border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.file-row .link-badge{font-size:11px;border-radius:5px;padding:2px 7px;background:var(--light);color:var(--green);white-space:nowrap}
+.file-row .link-badge.pending{background:#fbf6e9;color:#937238}
+.link-path{display:flex;gap:12px;align-items:center;font-size:12px;margin:8px 0;overflow-wrap:anywhere}
+.link-list{border:1px solid var(--line);border-radius:8px;max-height:45vh;overflow:auto}
+.link-list button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 12px;overflow-wrap:anywhere}
+.link-list button+button{border-top:1px solid var(--line)}
+.link-list button:hover,.link-list button.selected{background:var(--light)}
+.link-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px;font-size:12px}
+.link-actions button{margin-left:auto}

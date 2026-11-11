@@ -14,7 +14,7 @@ RUN groupadd --gid 10001 subtitle \
     && useradd --uid 10001 --gid subtitle --no-create-home subtitle \
     && mkdir /config /downloads \
     && chown subtitle:subtitle /config /downloads
-COPY --chown=10001:10001 app.py engine_adapter.py ./
+COPY --chown=10001:10001 app.py engine_adapter.py linker.py ./
 COPY --chown=10001:10001 engine ./engine
 COPY --chown=10001:10001 static ./static
 USER 10001:10001

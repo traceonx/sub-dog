@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import hmac
@@ -25,6 +26,10 @@ for directory in (CONFIG, DOWNLOADS):
     directory.mkdir(parents=True, exist_ok=True)
 
 from engine_adapter import build_engine, save_sessions, CaptchaCancelled, fmt_matches, lang_matches
+from linker import Linker, LinkError
+
+MEDIA = Path(os.environ['MEDIA_DIR']).resolve() if os.environ.get('MEDIA_DIR') else None
+linker = Linker(DOWNLOADS, MEDIA, CONFIG / 'links.json')
 
 TERMINAL = {'done', 'failed', 'cancelled'}
 CAPTCHA_TIMEOUT = 180
@@ -43,6 +48,21 @@ class SearchInput(BaseModel):
 class ItemInput(BaseModel):
     search_id: str = Field(max_length=40)
     item_id: str = Field(max_length=40)
+
+
+class LinkInput(BaseModel):
+    file: str = Field(min_length=1, max_length=1024)
+    video: str = Field(min_length=1, max_length=4096)
+    lang: str = Field(default='zh-CN', max_length=8)
+
+
+class KeepInput(BaseModel):
+    file: str = Field(min_length=1, max_length=1024)
+
+
+class CleanSettings(BaseModel):
+    auto_clean: bool = True
+    delay: int = Field(default=30, ge=5, le=7 * 24 * 3600)
 
 
 class AnswerInput(BaseModel):
@@ -169,7 +189,23 @@ class Manager:
 
 
 manager = Manager()
-app = FastAPI(title='字幕工作台', docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    linker.start(float(os.environ.get('SCAN_INTERVAL', '5')))
+    try:
+        yield
+    finally:
+        linker.stop()
+
+
+app = FastAPI(title='字幕工作台', docs_url=None, redoc_url=None, openapi_url=None, lifespan=lifespan)
+
+
+@app.exception_handler(LinkError)
+async def link_error(_request, exc: LinkError):
+    return JSONResponse({'detail': str(exc)}, status_code=exc.status)
 
 
 @app.middleware('http')
@@ -329,8 +365,10 @@ def files():
     result = []
     for path in DOWNLOADS.rglob('*'):
         if path.is_file() and not path.is_symlink() and path.resolve().is_relative_to(DOWNLOADS):
-            result.append({'path': str(path.relative_to(DOWNLOADS)), 'name': path.name,
-                           'size': path.stat().st_size, 'modified': path.stat().st_mtime})
+            st = path.stat()
+            rel = str(path.relative_to(DOWNLOADS)).replace(os.sep, '/')
+            result.append({'path': rel, 'name': path.name, 'size': st.st_size, 'modified': st.st_mtime,
+                           'nlink': st.st_nlink, 'link': linker.status(rel)})
         if len(result) >= 1000:
             break
     return sorted(result, key=lambda f: f['modified'], reverse=True)
@@ -342,3 +380,29 @@ def get_file(file_path: str):
     if not path.is_relative_to(DOWNLOADS) or not path.is_file():
         raise HTTPException(404, '文件不存在')
     return FileResponse(path, filename=path.name, media_type='application/octet-stream')
+
+
+@app.get('/api/media')
+def media(path: str = ''):
+    return linker.browse(path)
+
+
+@app.post('/api/links')
+def create_link(data: LinkInput):
+    return linker.link(data.file, data.video, data.lang)
+
+
+@app.post('/api/links/keep')
+def keep_file(data: KeepInput):
+    linker.keep(data.file)
+    return {'ok': True}
+
+
+@app.get('/api/links/settings')
+def link_settings():
+    return linker.public_settings()
+
+
+@app.put('/api/links/settings')
+def update_link_settings(data: CleanSettings):
+    return linker.update_settings(data.auto_clean, data.delay)
