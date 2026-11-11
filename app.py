@@ -31,6 +31,7 @@ from linker import Linker, LinkError
 MEDIA = Path(os.environ['MEDIA_DIR']).resolve() if os.environ.get('MEDIA_DIR') else None
 linker = Linker(DOWNLOADS, MEDIA, CONFIG / 'links.json')
 
+VERSION = os.environ.get('APP_VERSION') or (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 TERMINAL = {'done', 'failed', 'cancelled'}
 CAPTCHA_TIMEOUT = 180
 
@@ -240,7 +241,8 @@ def static_file(name: Literal['app.js', 'style.css']):
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'engine': 'recovered-cpython-3.12', 'version': '0.1.0'}
+    return {'status': 'ok', 'engine': 'recovered-cpython-3.12', 'version': VERSION,
+            'commit': os.environ.get('GIT_SHA', 'dev')[:7], 'build_time': os.environ.get('BUILD_TIME', '')}
 
 
 @app.get('/api/settings')

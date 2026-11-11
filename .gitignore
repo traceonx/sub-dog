@@ -11,3 +11,8 @@ runtime/
 /downloads/
 .pytest_cache/
 # engine/**/*.pyc is intentionally tracked: the recovered engine needs it.
+
+data/
+media-root/
+*.dump
+artifacts/*.tmp

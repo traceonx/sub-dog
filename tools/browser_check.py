@@ -19,7 +19,7 @@ seen = []
 
 def handler(route):
     request = route.request
-    path = request.url.split(':8080', 1)[-1]
+    path = request.url.split(':8082', 1)[-1]
     data = request.post_data_json if request.method == 'POST' else None
     seen.append((path, data))
     if path == '/api/settings':
@@ -59,7 +59,7 @@ with sync_playwright() as p:
     errors = []
     page.on('pageerror',lambda error: errors.append(str(error)))
     page.route('**/api/**',handler)
-    page.goto('http://127.0.0.1:8080/',wait_until='networkidle')
+    page.goto('http://127.0.0.1:8082/',wait_until='networkidle')
     page.locator('#keyword').fill('浏览器测试')
     page.locator('#search-button').click()
     field = page.get_by_role('textbox',name='验证码',exact=True)

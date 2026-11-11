@@ -1,0 +1,20 @@
+# 单容器部署：docker compose up -d，然后打开 http://服务器IP:8082
+# 配置、Cookie 和默认字幕库都在同级目录 ./data，备份或迁移时复制这个目录即可
+services:
+  app:
+    image: sunqz/sub-dog:latest
+    container_name: sub-dog
+    environment:
+      TZ: Asia/Shanghai
+      PUID: 1000                 # 与 NAS 上媒体文件所有者一致（群晖常见 1026 / 100），硬链接需要
+      PGID: 1000
+      # APP_PASSWORD: change-me  # 可选：网页登录密码（用户名 admin）
+      # 硬链接到媒体库：字幕库与媒体在同一存储卷，并只挂载一次它们的共同父目录（见下方 volumes）
+      # DOWNLOAD_DIR: /media-root/subtitles
+      # MEDIA_DIR: /media-root/media
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./data:/app/data
+      # - /volume1/data:/media-root
+    restart: unless-stopped

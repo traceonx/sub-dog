@@ -1,36 +1,4 @@
-services:
-  subtitle:
-    image: subtitle-web:local
-    build: .
-    init: true
-    ports:
-      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:8080"
-    environment:
-      ZIMUKU_DL_HOME: /config
-      DOWNLOAD_DIR: /downloads
-      APP_PASSWORD: ${APP_PASSWORD:-}
-      TZ: Asia/Shanghai
-      # 硬链接到媒体库（NAS）：字幕库与媒体必须在同一存储卷，并且通过同一个挂载点进入容器。
-      # 取消下面几行注释，并把 volumes 中的 subtitle-downloads 换成共同父目录的挂载：
-      # DOWNLOAD_DIR: /data/subtitles
-      # MEDIA_DIR: /data/media
-      # AUTO_CLEAN: "true"      # 媒体中的硬链接全部删除后，自动删除字幕库中的字幕
-      # CLEAN_DELAY: "30"       # 删除前等待的秒数（网页中可修改）
-    # 媒体文件属于 NAS 用户时，用该用户的 UID:GID 运行，否则无法在媒体目录中创建链接：
-    # user: "1026:100"
-    volumes:
-      - subtitle-config:/config
-      - subtitle-downloads:/downloads
-      # - /volume1/data:/data   # 只挂载一次共同父目录；分开挂载会导致 "Invalid cross-device link"
-    restart: unless-stopped
-    stop_grace_period: 30s
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    read_only: true
-    tmpfs:
-      - /tmp:size=64m,mode=1777
-volumes:
-  subtitle-config:
-  subtitle-downloads:
+# 在项目根目录执行 docker compose up -d --build
+include:
+  - path: deploy/compose.yml
+    env_file: .env

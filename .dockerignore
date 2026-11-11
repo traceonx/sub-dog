@@ -12,3 +12,6 @@ artifacts
 config
 downloads
 .pytest_cache
+data
+media-root
+.github
