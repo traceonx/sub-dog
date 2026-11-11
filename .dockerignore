@@ -1,0 +1,14 @@
+.git
+__pycache__
+**/__pycache__
+.test-config
+runtime
+tests
+artifacts
+.env
+*.zip
+
+.venv
+config
+downloads
+.pytest_cache

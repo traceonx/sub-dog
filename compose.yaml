@@ -1,0 +1,27 @@
+services:
+  subtitle:
+    image: subtitle-web:local
+    build: .
+    init: true
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PORT:-8080}:8080"
+    environment:
+      ZIMUKU_DL_HOME: /config
+      DOWNLOAD_DIR: /downloads
+      APP_PASSWORD: ${APP_PASSWORD:-}
+      TZ: Asia/Shanghai
+    volumes:
+      - subtitle-config:/config
+      - subtitle-downloads:/downloads
+    restart: unless-stopped
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+volumes:
+  subtitle-config:
+  subtitle-downloads:

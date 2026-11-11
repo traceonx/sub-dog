@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>字幕工作台</title><link rel="stylesheet" href="/static/style.css"><script defer src="/static/app.js"></script></head>
+<body>
+<header><a class="brand" href="/">字<span>幕</span>工作台</a><span class="badge">SUBTITLE DESK</span><span id="connection">正在连接…</span></header>
+<main>
+<section class="intro"><div class="eyebrow">为下一场电影，找到合适的字幕</div><h1>好故事，<span>不必隔着语言。</span></h1><p>搜索字幕库、SubHD 与伪射手，挑选格式，保存到你的下载目录。</p></section>
+<section class="panel search-panel"><form id="search-form"><label class="sr-only" for="keyword">电影或剧集名称</label><div class="search-line"><span class="search-icon">⌕</span><input id="keyword" name="keyword" placeholder="输入电影、剧集名称或发行版本…" required maxlength="150"><button id="search-button" type="submit">搜索字幕 <span>→</span></button></div><div class="options"><fieldset><legend>字幕来源</legend><label><input type="checkbox" name="sources" value="zimuku" checked> 字幕库</label><label><input type="checkbox" name="sources" value="subhd" checked> SubHD</label><label><input type="checkbox" name="sources" value="assrt" checked> 伪射手</label></fieldset><label>格式 <select id="fmt"><option value="">全部格式</option><option>SRT</option><option>ASS</option><option>SSA</option><option>SUP</option><option>VTT</option></select></label><label>语言 <select id="language"><option value="">全部语言</option><option>简体</option><option>繁体</option><option>双语</option><option>英文</option></select></label><label>上限 <input type="number" id="limit" value="40" min="1" max="100" required></label><label class="ocr"><input type="checkbox" id="use-ocr" checked> 自动识别验证码</label></div></form></section>
+<div id="notice" role="status" hidden></div>
+<div class="workspace"><section class="results-section"><div class="section-heading"><h2>搜索结果 <span id="result-count">0</span></h2><select id="search-history" aria-label="切换搜索任务"><option value="">暂无搜索</option></select></div><div id="source-errors"></div><div id="results" class="panel empty"><div class="empty-symbol">文</div><h3>从一部喜欢的电影开始</h3><p>搜索后，字幕会出现在这里。不同来源的结果会一起展示。</p></div></section><aside><div class="section-heading"><h2>任务动态</h2><span class="live-dot"></span></div><div id="tasks" class="panel"><p class="muted">搜索与下载进度将在这里显示。</p></div><div class="aside-note">需要人工验证时，会在这里显示验证码。支持换图和取消，等待时间为 3 分钟。</div></aside></div>
+<section class="files-section"><div class="section-heading"><h2>已下载文件 <span id="file-count">0</span></h2><button class="text-button" id="refresh-files">刷新列表 ↻</button></div><div id="files" class="panel"><p class="muted">还没有下载文件。</p></div></section>
+<footer><span>字幕工作台 · 本地部署版</span><span>Cookie 与文件保存在挂载目录 · 各字幕站的可用性取决于访问情况</span></footer>
+</main>
+<dialog id="detail-dialog"><div class="section-heading"><h2>字幕详情</h2><button class="text-button" id="close-detail">关闭 ×</button></div><article id="detail-content"></article></dialog>
+</body></html>

@@ -1,0 +1,66 @@
+{
+  "platform": "linux/amd64",
+  "engine": "recovered CPython 3.12 bytecode",
+  "search": {
+    "keyword": "星际穿越",
+    "status": "done",
+    "shown_by_source": {
+      "zimuku": 4,
+      "subhd": 4,
+      "assrt": 4
+    },
+    "errors": {}
+  },
+  "downloads": [
+    {
+      "source": "zimuku",
+      "status": "done",
+      "files": [
+        {
+          "name": "[zmk.pw]Interstellar.2014.2160p.BluRay.x265.10bit.SDR.DTS-HD.MA.5.1-SWTYBLZ.ass",
+          "bytes": 251040,
+          "sha256": "bb03ec628c9b34917af2eea828481634014a762ed567f74a5bb52ec555bbe9f6",
+          "ass_header": true
+        }
+      ]
+    },
+    {
+      "source": "assrt",
+      "status": "done",
+      "warnings": [],
+      "files": [
+        {
+          "name": "Interstellar.2014.1080p.BluRay.x264.DTS-RARBG.rar",
+          "bytes": 247257,
+          "sha256": "dba6524ecfe318595e1131544120e1f6d94c3463de97e8f9a316a3871b564033",
+          "rar_signature": true,
+          "zip_signature": false,
+          "ass_header": false,
+          "preview_text": false
+        }
+      ]
+    },
+    {
+      "source": "subhd",
+      "status": "done",
+      "warnings": [],
+      "files": [
+        {
+          "name": "Interstellar.2014.2160p.BluRay.x265.10bit.SDR.DTS-HD.MA.5.1-SWTYBLZ.ass",
+          "bytes": 251040,
+          "sha256": "bb03ec628c9b34917af2eea828481634014a762ed567f74a5bb52ec555bbe9f6",
+          "rar_signature": false,
+          "zip_signature": false,
+          "ass_header": true,
+          "preview_text": false
+        }
+      ]
+    }
+  ],
+  "fallback_behavior": {
+    "subhd_preview_observed_in_earlier_run": true,
+    "preview_renaming_test_passed": true
+  },
+  "integration_tests": 8,
+  "browser_checks": 8
+}

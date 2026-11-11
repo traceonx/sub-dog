@@ -1,0 +1,13 @@
+__pycache__/
+.venv/
+.env
+runtime/
+.test-config/
+*.tar
+*.tar.gz
+
+# Bind-mounted user data
+/config/
+/downloads/
+.pytest_cache/
+# engine/**/*.pyc is intentionally tracked: the recovered engine needs it.

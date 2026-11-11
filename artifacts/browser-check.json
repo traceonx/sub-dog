@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "search submission",
+    "CAPTCHA input survives polling",
+    "CAPTCHA submission",
+    "results rendering",
+    "detail dialog",
+    "download submission",
+    "browser file download",
+    "mobile overflow"
+  ],
+  "js_errors": [],
+  "network": "mocked jobs, real application static assets"
+}

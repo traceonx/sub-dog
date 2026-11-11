@@ -1,0 +1,23 @@
+{
+  "origin": "电影字幕下载工具.exe",
+  "sha256": "97d7d23f57ac3dbc4fa64fcb6c733f6e92d373368374e2ed69ab3dad9377f59c",
+  "python": "3.12",
+  "modules": [
+    "zimuku_dl",
+    "zimuku_dl.aggregate",
+    "zimuku_dl.captcha",
+    "zimuku_dl.client",
+    "zimuku_dl.config",
+    "zimuku_dl.filters",
+    "zimuku_dl.models",
+    "zimuku_dl.ocr",
+    "zimuku_dl.parser",
+    "zimuku_dl.session",
+    "zimuku_dl.sources",
+    "zimuku_dl.sources.assrt",
+    "zimuku_dl.sources.base",
+    "zimuku_dl.sources.subhd",
+    "zimuku_dl.sources.zimuku"
+  ],
+  "note": "Recovered bytecode, not reconstructed source. Original GUI excluded."
+}
