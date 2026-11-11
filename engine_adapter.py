@@ -9,6 +9,8 @@ import sys
 import zipfile
 from urllib.parse import urlsplit, unquote
 
+import captcha_ocr
+
 sys.path.insert(0, str(Path(__file__).parent / 'engine'))
 from zimuku_dl.client import ZimukuClient
 from zimuku_dl.aggregate import Aggregator
@@ -137,6 +139,7 @@ ZimukuClient._extract_if_archive = lambda self, path: safe_extract(path, self.lo
 def build_engine(logger, manual_solver, use_ocr=True):
     client = ZimukuClient(logger=logger, manual_solver=manual_solver,
                           use_ocr=use_ocr, timeout=15, min_interval=1.2)
+    captcha_ocr.attach(client, logger)
     return Aggregator(zimuku_client=client, logger=logger, min_interval=1.2, timeout=15)
 
 

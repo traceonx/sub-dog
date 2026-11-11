@@ -41,6 +41,10 @@ docker save -o sub-dog-image.tar sub-dog:local
 - 分别挂载 `subtitles` 和 `media` 两个目录会导致 `Invalid cross-device link`，即使它们在同一个卷上。
 - 不使用硬链接时，`MEDIA_DIR` 留空，字幕保存在 `appdata` 卷中。
 
+## 验证码识别
+
+默认使用 ppllocr（ONNX 模型随镜像提供，无需联网下载）。如需回退到原内置识别，在 compose 的 `environment` 中设置 `OCR_ENGINE: glyph`。可通过 `http://NAS地址:8082/api/health` 中的 `ocr` 字段查看当前引擎与加载状态。
+
 ## 数据、更新和备份
 
 配置、站点 Cookie、硬链接记录保存在 `appdata` 卷（`/app/data/config`）。普通重建容器和 `docker compose down` 会保留数据，**不要使用 `down -v`**。

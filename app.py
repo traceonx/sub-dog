@@ -27,6 +27,7 @@ for directory in (CONFIG, DOWNLOADS):
 
 from engine_adapter import build_engine, save_sessions, CaptchaCancelled, fmt_matches, lang_matches
 from linker import Linker, LinkError
+import captcha_ocr
 
 MEDIA = Path(os.environ['MEDIA_DIR']).resolve() if os.environ.get('MEDIA_DIR') else None
 linker = Linker(DOWNLOADS, MEDIA, CONFIG / 'links.json')
@@ -195,6 +196,7 @@ manager = Manager()
 @asynccontextmanager
 async def lifespan(_app):
     linker.start(float(os.environ.get('SCAN_INTERVAL', '5')))
+    captcha_ocr.preload()
     try:
         yield
     finally:
@@ -242,7 +244,8 @@ def static_file(name: Literal['app.js', 'style.css']):
 @app.get('/api/health')
 def health():
     return {'status': 'ok', 'engine': 'recovered-cpython-3.12', 'version': VERSION,
-            'commit': os.environ.get('GIT_SHA', 'dev')[:7], 'build_time': os.environ.get('BUILD_TIME', '')}
+            'commit': os.environ.get('GIT_SHA', 'dev')[:7], 'build_time': os.environ.get('BUILD_TIME', ''),
+            'ocr': captcha_ocr.status()}
 
 
 @app.get('/api/settings')
