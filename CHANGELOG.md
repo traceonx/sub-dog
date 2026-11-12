@@ -1,5 +1,12 @@
 # 更新日志
 
+## 0.4.0
+
+- 恢复分支推送时自动执行测试及 amd64 / arm64 原生构建，发布 Docker Hub 多架构镜像。
+- 恢复分支使用 `recovery`、`recovery-0.4.0` 和提交 SHA 标签，不覆盖 `main` 的 `latest` 标签。
+- NAS 配置默认拉取 `sunqz/sub-dog:recovery`，无需在 NAS 上构建。
+- 镜像检查使用本次实际生成的标签，兼容恢复分支发布。
+
 ## 0.3.0
 
 - 验证码识别改用 [ppllocr](https://github.com/gitpetyr/ppllocr)（YOLOv11 + ONNX，MIT 协议）。只有识别出 5 位数字且每位置信度不低于 0.5 时才自动提交，否则转人工输入。

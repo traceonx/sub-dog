@@ -11,7 +11,7 @@ name: Docker 镜像
 #   DOCKER_PASSWORD  Docker Hub Access Token（Read & Write）或密码
 on:
   push:
-    branches: [main]
+    branches: [main, 'recovery/**']
     tags: ['v*']
   pull_request:
   workflow_dispatch:
@@ -154,6 +154,8 @@ jobs:
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ steps.version.outputs.version }},enable={{is_default_branch}}
+            type=raw,value=recovery,enable=${{ startsWith(github.ref, 'refs/heads/recovery/') }}
+            type=raw,value=recovery-${{ steps.version.outputs.version }},enable=${{ startsWith(github.ref, 'refs/heads/recovery/') }}
             type=sha,prefix=sha-
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -167,8 +169,11 @@ jobs:
             $(printf "$IMAGE@sha256:%s " *)
 
       - name: 检查结果
+        env:
+          METADATA_JSON: ${{ steps.meta.outputs.json }}
         run: |
-          docker buildx imagetools inspect "$IMAGE:${{ steps.version.outputs.version }}"
+          tag=$(jq -r '.tags[0]' <<< "$METADATA_JSON")
+          docker buildx imagetools inspect "$tag"
           {
             echo "### $IMAGE"
             echo '```'

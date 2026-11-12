@@ -2,7 +2,7 @@
 # 配置、Cookie 和默认字幕库都在同级目录 ./data，备份或迁移时复制这个目录即可
 services:
   app:
-    image: sunqz/sub-dog:latest
+    image: sunqz/sub-dog:recovery
     container_name: sub-dog
     environment:
       TZ: Asia/Shanghai

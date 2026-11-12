@@ -4,7 +4,7 @@
 
 ## 推荐：拉取 Docker Hub 镜像
 
-GitHub Actions 推送到 main 后会发布多架构镜像 `docker.io/sunqz/sub-dog`（amd64 / arm64）。把本目录的 `compose.yaml`、`.env.example` 复制到 NAS 的独立项目目录：
+GitHub Actions 在 `recovery/**` 分支推送后发布 `docker.io/sunqz/sub-dog:recovery` 多架构镜像（amd64 / arm64），`main` 发布 `latest`。恢复版可固定为 `recovery-0.4.0` 或 `sha-xxxxxxx` 标签。把本目录的 `compose.yaml`、`.env.example` 复制到 NAS 的独立项目目录：
 
 ```sh
 cp .env.example .env

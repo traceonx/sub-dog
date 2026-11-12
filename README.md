@@ -51,7 +51,7 @@ Sub-Dog 是一款支持 Docker 部署的字幕搜索与下载工具，聚合字�
 服务器直接拉取镜像（数据保存在同级 `./data` 目录）：
 
 ```sh
-curl -O https://raw.githubusercontent.com/traceonx/sub-dog/main/deploy/docker-compose.yml
+curl -O https://raw.githubusercontent.com/traceonx/sub-dog/recovery/claude-v0.3.0/deploy/docker-compose.yml
 docker compose up -d
 ```
 
@@ -64,4 +64,4 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-推送到 main 时 GitHub Actions 依次执行 verify → build（amd64 / arm64 原生构建）→ push，发布 `sunqz/sub-dog` 多架构镜像；需要在仓库 Secrets 中配置 `DOCKER_USERNAME` 与 `DOCKER_PASSWORD`。
+推送到恢复分支时，GitHub Actions 依次执行 verify → build（amd64 / arm64 原生构建）→ push，发布 `sunqz/sub-dog:recovery`；`main` 使用 `latest`。需要在仓库 Secrets 中配置 `DOCKER_USERNAME` 与 `DOCKER_PASSWORD`。
