@@ -72,7 +72,7 @@ with sync_playwright() as p:
     page.get_by_role('button',name='查看详情',exact=True).click()
     page.get_by_role('heading',name='字幕详情测试',exact=True).wait_for(timeout=10000)
     page.get_by_role('button',name='关闭 ×',exact=True).click()
-    page.get_by_role('button',name='下载 ↓',exact=True).click()
+    page.get_by_role('button',name='下载',exact=True).click()
     link = page.get_by_role('link',name='fixture.srt',exact=True)
     link.wait_for(timeout=10000)
     with page.expect_download() as download:
